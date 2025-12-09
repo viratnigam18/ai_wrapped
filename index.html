@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ChatGPT Wrapped</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg-1: #0b1020;
+      --bg-2: #14192b;
+      --accent-1: #1db954;
+      --accent-2: #8b5cf6;
+      --accent-3: #f97316;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --card-bg: rgba(15, 23, 42, 0.78);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --radius-lg: 18px;
+      --radius-xl: 28px;
+      --shadow-soft: 0 20px 45px rgba(0, 0, 0, 0.45);
+      --transition-fast: 200ms ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 0% 0%, #22c55e22 0, transparent 45%),
+        radial-gradient(circle at 100% 100%, #6366f122 0, transparent 50%),
+        linear-gradient(135deg, #020617, #020818 60%, #020617);
+      color: var(--text-main);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1100px;
+      padding: 18px 16px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    header.app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(15,23,42,0.98), rgba(15,23,42,0.86));
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+      position: sticky;
+      top: 8px;
+      z-index: 10;
+      backdrop-filter: blur(14px);
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: conic-gradient(from 210deg, #22c55e, #a855f7, #22c55e);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo-text-title {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .logo-text-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.12);
+      color: #bbf7d0;
+      font-size: 11px;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Upload screen */
+
+    #upload-screen {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-card {
+      width: 100%;
+      max-width: 520px;
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(circle at top left, rgba(34, 197, 94, 0.22), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.25), transparent 55%),
+        var(--card-bg);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 26px 22px 28px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.75), transparent 65%);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .upload-inner {
+      position: relative;
+    }
+
+    .upload-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .upload-subtitle {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .upload-steps {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .highlight {
+      color: #a5b4fc;
+      font-weight: 500;
+    }
+
+    .file-drop {
+      margin-top: 12px;
+      padding: 16px 14px;
+      border-radius: 18px;
+      border: 1px dashed rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.85);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .file-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(34, 197, 94, 0.5);
+      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.26), rgba(21, 128, 61, 0.75));
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .file-label span.icon {
+      font-size: 16px;
+    }
+
+    .file-help {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .local-badge {
+      margin-top: 10px;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: #e5e7eb;
+    }
+
+    .local-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+    }
+
+    .error-text {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #fecaca;
+    }
+
+    /* "Ready" screen before slides */
+
+    #ready-screen {
+      flex: 1;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ready-card {
+      width: 100%;
+      max-width: 520px;
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(circle at top right, rgba(59, 130, 246, 0.26), transparent 55%),
+        radial-gradient(circle at bottom left, rgba(34, 197, 94, 0.26), transparent 55%),
+        var(--card-bg);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 26px 22px 26px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ready-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.65), transparent 70%);
+      pointer-events: none;
+    }
+
+    .ready-inner {
+      position: relative;
+    }
+
+    .ready-tag {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #a5b4fc;
+      margin-bottom: 8px;
+    }
+
+    .ready-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .ready-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .ready-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .ready-pill {
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      font-size: 11px;
+      display: inline-flex;
+      gap: 4px;
+      align-items: baseline;
+    }
+
+    .ready-pill span.value {
+      font-weight: 600;
+      color: #bbf7d0;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      border-radius: 999px;
+      padding: 8px 16px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .primary-btn {
+      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.3), rgba(22, 163, 74, 1));
+      color: #ecfdf5;
+      border: 1px solid rgba(34, 197, 94, 0.7);
+      box-shadow: 0 10px 30px rgba(22, 163, 74, 0.7);
+    }
+
+    .secondary-btn {
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+    }
+
+    .primary-btn:active,
+    .secondary-btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-icon {
+      font-size: 16px;
+    }
+
+    /* Slides */
+
+    #slides {
+      flex: 1;
+      display: none;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    #slides.active {
+      display: flex;
+    }
+
+    .slide-shell {
+      width: 100%;
+      max-width: 700px;
+      border-radius: 32px;
+      background:
+        radial-gradient(circle at top left, rgba(34, 197, 94, 0.18), transparent 58%),
+        radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.25), transparent 62%),
+        var(--card-bg);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      padding: 26px 28px 22px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide-shell::before {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(56, 189, 248, 0.25), transparent 60%),
+        radial-gradient(circle at 80% 100%, rgba(109, 40, 217, 0.25), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .slide-shell-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .slide-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #e5e7eb;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 3px 10px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
+    .progress-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.45);
+      opacity: 0.55;
+      transform: scale(1);
+      transition: opacity var(--transition-fast), transform var(--transition-fast), background var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .dot.active {
+      background: #22c55e;
+      opacity: 1;
+      transform: scale(1.15);
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+    }
+
+    .slide-container {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 260px;
+      opacity: 0;
+      transform: translateX(18px);
+      transition: opacity 260ms ease-out, transform 260ms ease-out;
+      pointer-events: none;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .slide-main {
+      margin-top: 10px;
+      margin-bottom: 16px;
+    }
+
+    .slide-tag {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: #d1fae5;
+      margin-bottom: 10px;
+    }
+
+    .slide-title {
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .slide-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 440px;
+    }
+
+    .stat-highlight {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.05;
+      margin-bottom: 6px;
+      color: #bbf7d0;
+    }
+
+    .stat-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .stat-chip {
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      font-size: 11px;
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-chip span.value {
+      font-weight: 600;
+      color: #a5b4fc;
+    }
+
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      gap: 12px;
+    }
+
+    .hint-text {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Dashboard */
+
+    #dashboard {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 6px;
+    }
+
+    #dashboard.active {
+      display: flex;
+    }
+
+    .dash-card {
+      border-radius: var(--radius-lg);
+      background:
+        radial-gradient(circle at top left, rgba(34, 197, 94, 0.14), transparent 56%),
+        radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.17), transparent 60%),
+        var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      padding: 14px 16px;
+      box-shadow: 0 16px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .dash-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .dash-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .dash-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .card-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    @media (min-width: 720px) {
+      .card-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    .mini-card {
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      padding: 10px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-height: 80px;
+      justify-content: space-between;
+    }
+
+    .mini-label {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .mini-value {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .mini-tag {
+      font-size: 10px;
+      color: #a5b4fc;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .chart-row {
+      display: grid;
+      gap: 10px;
+    }
+
+    @media (min-width: 880px) {
+      .chart-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    canvas {
+      width: 100%;
+      height: 220px;
+    }
+
+    .tiny-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .thanks-card {
+      margin-top: 10px;
+    }
+
+    .thanks-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .dash-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    @media (max-width: 640px) {
+      .slide-shell {
+        border-radius: 22px;
+        padding: 18px 16px 14px;
+      }
+      .slide-title {
+        font-size: 24px;
+      }
+      .stat-highlight {
+        font-size: 32px;
+      }
+      header.app-header {
+        padding-inline: 12px;
+      }
+      .upload-card,
+      .ready-card {
+        padding: 20px 16px 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="logo-wrap">
+        <div class="logo-circle">
+          <div class="logo-inner">∞</div>
+        </div>
+        <div>
+          <div class="logo-text-title">ChatGPT Wrapped</div>
+          <div class="logo-text-sub">Your year in prompts</div>
+        </div>
+      </div>
+      <div class="badge">Local only</div>
+    </header>
+
+    <main>
+      <!-- Upload screen -->
+      <section id="upload-screen">
+        <div class="upload-card">
+          <div class="upload-inner">
+            <div class="upload-title">Drop your <span style="color:#a5b4fc;">conversations.json</span></div>
+            <div class="upload-subtitle">
+              Turn your ChatGPT chats into a personal Wrapped style story.
+            </div>
+
+            <div class="upload-steps">
+              <ol style="list-style-position: inside; margin-left: 4px;">
+                <li>In ChatGPT, go to <span class="highlight">Settings → Data & privacy → Export</span>.</li>
+                <li>Unzip the file and find <span class="highlight">conversations.json</span>.</li>
+                <li>Upload it below. Everything is processed inside your browser.</li>
+              </ol>
+            </div>
+
+            <div class="file-drop">
+              <label class="file-label" for="fileInput">
+                <span class="icon">📂</span>
+                <span>Upload conversations.json</span>
+              </label>
+              <div class="file-help">We only read it in your browser, nothing is sent to any server.</div>
+              <input type="file" id="fileInput" accept=".json" />
+            </div>
+
+            <div class="local-badge">
+              <span class="local-dot"></span>
+              <span>Local analysis only, safe to play with your own data</span>
+            </div>
+
+            <div id="upload-error" class="error-text" style="display:none;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Ready screen -->
+      <section id="ready-screen">
+        <div class="ready-card">
+          <div class="ready-inner">
+            <div class="ready-tag">Wrapped is ready</div>
+            <div class="ready-title">Your ChatGPT year is loaded.</div>
+            <div class="ready-subtitle">
+              We scanned your export and built a short story of how you used ChatGPT. When you are ready, hit play.
+            </div>
+
+            <div class="ready-summary">
+              <div class="ready-pill">
+                Prompts
+                <span class="value" id="ready-total-prompts">0</span>
+              </div>
+              <div class="ready-pill">
+                Conversations
+                <span class="value" id="ready-total-conversations">0</span>
+              </div>
+              <div class="ready-pill">
+                Active days
+                <span class="value" id="ready-active-days">0</span>
+              </div>
+            </div>
+
+            <button class="primary-btn" id="startWrappedBtn">
+              <span>Start my Wrapped</span>
+              <span class="btn-icon">▶</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slides -->
+      <section id="slides">
+        <div class="slide-shell">
+          <div class="slide-shell-inner">
+            <div class="slide-top">
+              <div class="pill">Wrapped story</div>
+              <div class="progress-dots" id="progressDots"></div>
+            </div>
+
+            <div class="slide-container">
+              <!-- Slide 0: Intro -->
+              <div class="slide active" data-slide-index="0">
+                <div class="slide-main">
+                  <div class="slide-tag">Welcome</div>
+                  <div class="slide-title">
+                    You talked, you typed, you brainstormed.
+                  </div>
+                  <div class="slide-desc">
+                    Here is how you used ChatGPT this year, one slide at a time. Use the arrows on your keyboard or the button below.
+                  </div>
+                </div>
+                <div class="slide-footer">
+                  <div class="hint-text">Tip: press right arrow or click the slide to go next.</div>
+                  <button class="primary-btn slide-next-btn">
+                    <span>Next</span>
+                    <span class="btn-icon">➜</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Slide 1: Total prompts and chats -->
+              <div class="slide" data-slide-index="1">
+                <div class="slide-main">
+                  <div class="slide-tag">Volume</div>
+                  <div class="slide-title">
+                    You sent <span id="slide-total-prompts" style="color:#bbf7d0;">0</span> prompts.
+                  </div>
+                  <div class="slide-desc">
+                    That is across <span id="slide-total-conversations" class="highlight">0</span> separate conversations with ChatGPT.
+                  </div>
+
+                  <div class="stat-row">
+                    <div class="stat-chip">
+                      Prompts per conversation
+                      <span class="value" id="slide-avg-prompts">0</span>
+                    </div>
+                    <div class="stat-chip">
+                      Active days with prompts
+                      <span class="value" id="slide-active-days">0</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="slide-footer">
+                  <div class="hint-text">You and ChatGPT talked a lot.</div>
+                  <button class="primary-btn slide-next-btn">
+                    <span>Next</span>
+                    <span class="btn-icon">➜</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Slide 2: Time and habits -->
+              <div class="slide" data-slide-index="2">
+                <div class="slide-main">
+                  <div class="slide-tag">Rhythm</div>
+                  <div class="slide-title">
+                    Your most active day was <span id="slide-most-active-date" style="color:#bbf7d0;">N/A</span>.
+                  </div>
+                  <div class="slide-desc">
+                    On that day, you sent <span id="slide-most-active-date-count" class="highlight">0</span> prompts. Something big was on your mind.
+                  </div>
+
+                  <div class="stat-row">
+                    <div class="stat-chip">
+                      Favorite day of week
+                      <span class="value" id="slide-active-weekday">N/A</span>
+                    </div>
+                    <div class="stat-chip">
+                      Peak hour
+                      <span class="value" id="slide-active-hour">N/A</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="slide-footer">
+                  <div class="hint-text">We all have a favorite time to overthink.</div>
+                  <button class="primary-btn slide-next-btn">
+                    <span>Next</span>
+                    <span class="btn-icon">➜</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Slide 3: Longest conversation -->
+              <div class="slide" data-slide-index="3">
+                <div class="slide-main">
+                  <div class="slide-tag">Deep dives</div>
+                  <div class="slide-title">
+                    Your longest conversation went on for
+                  </div>
+                  <div class="stat-highlight">
+                    <span id="slide-longest-messages">0</span> messages
+                  </div>
+                  <div class="slide-desc">
+                    That chat lasted around <span id="slide-longest-duration" class="highlight">0 minutes</span>
+                    from first prompt to last response. You really went down the rabbit hole.
+                  </div>
+
+                  <div class="stat-row">
+                    <div class="stat-chip">
+                      Total words you typed this year
+                      <span class="value" id="slide-total-words">0</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="slide-footer">
+                  <div class="hint-text">One more slide then your dashboard.</div>
+                  <button class="primary-btn slide-next-btn">
+                    <span>Next</span>
+                    <span class="btn-icon">➜</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Slide 4: Ask about dashboard -->
+              <div class="slide" data-slide-index="4">
+                <div class="slide-main">
+                  <div class="slide-tag">One last thing</div>
+                  <div class="slide-title">
+                    Want a mini dashboard with all your numbers?
+                  </div>
+                  <div class="slide-desc">
+                    You can see charts for your most active days, favorite hours, and a compact summary of your ChatGPT habits.
+                  </div>
+                </div>
+                <div class="slide-footer">
+                  <div class="hint-text">You can reload the page and try another export any time.</div>
+                  <div style="display:flex; gap:8px;">
+                    <button class="secondary-btn" id="skipDashboardBtn">
+                      <span>No, just finish</span>
+                    </button>
+                    <button class="primary-btn" id="showDashboardBtn">
+                      <span>Yes, show dashboard</span>
+                      <span class="btn-icon">📊</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div> <!-- slide-container -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard -->
+      <section id="dashboard">
+        <div class="dash-card">
+          <div class="dash-header">
+            <div>
+              <div class="dash-title">Your ChatGPT snapshot</div>
+              <div class="dash-subtitle">Quick summary of your year in prompts.</div>
+            </div>
+            <div class="dash-actions">
+              <button class="secondary-btn" id="replayBtn" style="padding:6px 12px; font-size:11px;">
+                <span class="btn-icon">⟲</span>
+                <span>Replay Wrapped</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-grid">
+            <div class="mini-card">
+              <div class="mini-label">Total prompts</div>
+              <div class="mini-value" id="dash-total-prompts">0</div>
+              <div class="mini-tag">You had a lot to say</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-label">Conversations</div>
+              <div class="mini-value" id="dash-total-conversations">0</div>
+              <div class="mini-tag">Different threads, same brain</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-label">Active days</div>
+              <div class="mini-value" id="dash-active-days">0</div>
+              <div class="mini-tag">You kept showing up</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-label">Words typed</div>
+              <div class="mini-value" id="dash-total-words">0</div>
+              <div class="mini-tag">Your keyboard did work</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-header">
+            <div>
+              <div class="dash-title">When you are most active</div>
+              <div class="dash-subtitle">Days and hours where you use ChatGPT the most.</div>
+            </div>
+          </div>
+
+          <div class="chart-row">
+            <div>
+              <canvas id="weekdayChart"></canvas>
+            </div>
+            <div>
+              <canvas id="hourChart"></canvas>
+            </div>
+          </div>
+
+          <div class="tiny-note">
+            Peak day in week:
+            <span id="dash-peak-weekday" class="highlight">N/A</span> •
+            Peak hour:
+            <span id="dash-peak-hour" class="highlight">N/A</span> •
+            Most active date:
+            <span id="dash-peak-date" class="highlight">N/A</span>
+          </div>
+        </div>
+
+          <div class="dash-card thanks-card">
+  <div class="dash-header" style="margin-bottom:4px;">
+    <div class="dash-title">That is your Wrapped</div>
+  </div>
+  <p>
+    All of this was computed locally in your browser from your ChatGPT export. If you liked the view, save a screenshot or refresh and try another file.
+  </p>
+  <p style="margin-top:8px; font-size:12px;">
+    If you want to support the creator of this tool:
+    <a href="https://ko-fi.com/O5O61PZIZF" target="_blank" rel="noopener" style="color:#72a4f2; text-decoration:underline;">
+      Ko-fi
+    </a>
+    ·
+    <a href="https://buymeacoffee.com/viratnigam" target="_blank" rel="noopener" style="color:#facc15; text-decoration:underline;">
+      BuyMeACoffee
+    </a>
+  </p>
+</div>
+ 
+        
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function formatNumber(n) {
+      if (!Number.isFinite(n)) return "0";
+      return n.toLocaleString();
+    }
+
+    function formatHourRange(hour) {
+      const h = Number(hour);
+      const label = (val) => `${String(val).padStart(2, "0")}:00`;
+      const next = (h + 1) % 24;
+      return `${label(h)} - ${label(next)}`;
+    }
+
+    function weekdayName(idx) {
+      const names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      return names[idx] || "Unknown";
+    }
+
+    function extractUserMessages(raw) {
+      let convs = raw;
+      if (raw && Array.isArray(raw.conversations)) {
+        convs = raw.conversations;
+      }
+      if (!Array.isArray(convs)) {
+        throw new Error("Could not find an array of conversations in this JSON file.");
+      }
+
+      const messages = [];
+      convs.forEach((conv, index) => {
+        const mapping = conv.mapping;
+        if (mapping && typeof mapping === "object") {
+          Object.values(mapping).forEach((node) => {
+            if (!node || !node.message) return;
+            const msg = node.message;
+            if (!msg.author || msg.author.role !== "user") return;
+
+            let text = "";
+            if (msg.content) {
+              if (Array.isArray(msg.content.parts)) {
+                text = msg.content.parts.join(" ");
+              } else if (typeof msg.content === "string") {
+                text = msg.content;
+              } else if (msg.content.text) {
+                if (typeof msg.content.text === "string") {
+                  text = msg.content.text;
+                } else if (Array.isArray(msg.content.text)) {
+                  text = msg.content.text.join(" ");
+                }
+              }
+            }
+            if (typeof text !== "string") {
+              text = "";
+            }
+
+            let ts = msg.create_time || node.create_time || conv.create_time;
+            if (!ts) return;
+            if (ts < 1e11) {
+              ts = ts * 1000;
+            }
+
+            messages.push({
+              convIndex: index,
+              timestamp: ts,
+              text: text.trim()
+            });
+          });
+        } else if (Array.isArray(conv.messages)) {
+          conv.messages.forEach((msg) => {
+            if (!msg || (msg.role !== "user" && msg.author?.role !== "user")) return;
+            const role = msg.role || msg.author?.role;
+            if (role !== "user") return;
+
+            let text = "";
+            if (typeof msg.content === "string") {
+              text = msg.content;
+            } else if (msg.content && Array.isArray(msg.content.parts)) {
+              text = msg.content.parts.join(" ");
+            }
+
+            let ts = msg.create_time || msg.timestamp || conv.create_time;
+            if (!ts) return;
+            if (ts < 1e11) ts = ts * 1000;
+
+            messages.push({
+              convIndex: index,
+              timestamp: ts,
+              text: text.trim()
+            });
+          });
+        }
+      });
+
+      return { convs, messages };
+    }
+
+    function computeStats(convs, messages) {
+      const totalPrompts = messages.length;
+      const totalConversations = Array.isArray(convs) ? convs.length : 0;
+
+      const dateSet = new Set();
+      const dateCounts = {};
+      const weekdayCounts = Array(7).fill(0);
+      const hourCounts = Array(24).fill(0);
+      let totalWords = 0;
+
+      const byConversation = new Map();
+
+      messages.forEach((m) => {
+        const d = new Date(m.timestamp);
+        const yyyyMmDd = d.toISOString().slice(0, 10);
+        dateSet.add(yyyyMmDd);
+        dateCounts[yyyyMmDd] = (dateCounts[yyyyMmDd] || 0) + 1;
+
+        const wd = d.getDay();
+        weekdayCounts[wd] = (weekdayCounts[wd] || 0) + 1;
+
+        const h = d.getHours();
+        hourCounts[h] = (hourCounts[h] || 0) + 1;
+
+        const words = m.text.split(/\s+/).filter(Boolean).length;
+        totalWords += words;
+
+        if (!byConversation.has(m.convIndex)) {
+          byConversation.set(m.convIndex, []);
+        }
+        byConversation.get(m.convIndex).push(m);
+      });
+
+      const totalActiveDays = dateSet.size;
+      const avgPromptsPerChat = totalConversations > 0 ? totalPrompts / totalConversations : 0;
+
+      let mostActiveDate = null;
+      let mostActiveDateCount = 0;
+      Object.entries(dateCounts).forEach(([date, count]) => {
+        if (count > mostActiveDateCount) {
+          mostActiveDateCount = count;
+          mostActiveDate = date;
+        }
+      });
+
+      let peakWeekdayIndex = null;
+      let peakWeekdayCount = 0;
+      weekdayCounts.forEach((c, idx) => {
+        if (c > peakWeekdayCount) {
+          peakWeekdayCount = c;
+          peakWeekdayIndex = idx;
+        }
+      });
+
+      let peakHourIndex = null;
+      let peakHourCount = 0;
+      hourCounts.forEach((c, idx) => {
+        if (c > peakHourCount) {
+          peakHourCount = c;
+          peakHourIndex = idx;
+        }
+      });
+
+      let longestConvIndex = null;
+      let longestConvMsgs = 0;
+      let longestConvDurationMinutes = 0;
+
+      byConversation.forEach((list, idx) => {
+        if (!Array.isArray(list) || list.length === 0) return;
+        if (list.length > longestConvMsgs) {
+          longestConvMsgs = list.length;
+          longestConvIndex = idx;
+          const sorted = [...list].sort((a, b) => a.timestamp - b.timestamp);
+          const durationMs = sorted[sorted.length - 1].timestamp - sorted[0].timestamp;
+          longestConvDurationMinutes = Math.round(durationMs / 60000);
+        }
+      });
+
+      return {
+        totalPrompts,
+        totalConversations,
+        totalActiveDays,
+        avgPromptsPerChat,
+        totalWords,
+        mostActiveDate,
+        mostActiveDateCount,
+        peakWeekdayIndex,
+        peakWeekdayCount,
+        peakHourIndex,
+        peakHourCount,
+        weekdayCounts,
+        hourCounts,
+        longestConvIndex,
+        longestConvMsgs,
+        longestConvDurationMinutes
+      };
+    }
+
+    const uploadScreen = document.getElementById("upload-screen");
+    const readyScreen = document.getElementById("ready-screen");
+    const slidesSection = document.getElementById("slides");
+    const dashboardSection = document.getElementById("dashboard");
+    const uploadErrorEl = document.getElementById("upload-error");
+    const fileInput = document.getElementById("fileInput");
+
+    let currentSlide = 0;
+    const totalSlides = 5;
+    let statsGlobal = null;
+    let weekdayChart = null;
+    let hourChart = null;
+
+    const progressDotsContainer = document.getElementById("progressDots");
+    const dots = [];
+    for (let i = 0; i < totalSlides; i++) {
+      const dot = document.createElement("div");
+      dot.className = "dot" + (i === 0 ? " active" : "");
+      dot.dataset.index = String(i);
+      progressDotsContainer.appendChild(dot);
+      dots.push(dot);
+    }
+
+    function updateDots() {
+      dots.forEach((d, idx) => {
+        if (idx === currentSlide) d.classList.add("active");
+        else d.classList.remove("active");
+      });
+    }
+
+    function showSlide(index) {
+      const slideEls = document.querySelectorAll(".slide");
+      slideEls.forEach((el) => {
+        const i = Number(el.getAttribute("data-slide-index"));
+        if (i === index) {
+          el.classList.add("active");
+        } else {
+          el.classList.remove("active");
+        }
+      });
+      currentSlide = index;
+      updateDots();
+    }
+
+    function goToNextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        showSlide(currentSlide + 1);
+      }
+    }
+
+    dots.forEach((dot) => {
+      dot.addEventListener("click", () => {
+        const idx = Number(dot.dataset.index);
+        showSlide(idx);
+      });
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (slidesSection.style.display === "none") return;
+      if (e.key === "ArrowRight") {
+        goToNextSlide();
+      } else if (e.key === "ArrowLeft") {
+        if (currentSlide > 0) showSlide(currentSlide - 1);
+      }
+    });
+
+    document.querySelectorAll(".slide").forEach((slide) => {
+      slide.addEventListener("click", (e) => {
+        const target = e.target;
+        if (target.closest("button")) return;
+        goToNextSlide();
+      });
+    });
+
+    document.querySelectorAll(".slide-next-btn").forEach((btn) => {
+      btn.addEventListener("click", goToNextSlide);
+    });
+
+    document.getElementById("showDashboardBtn").addEventListener("click", () => {
+      slidesSection.style.display = "none";
+      dashboardSection.classList.add("active");
+      scrollTo(0, 0);
+      renderDashboard(statsGlobal);
+    });
+
+    document.getElementById("skipDashboardBtn").addEventListener("click", () => {
+      slidesSection.style.display = "none";
+      dashboardSection.classList.add("active");
+      scrollTo(0, 0);
+      renderDashboard(statsGlobal, true);
+    });
+
+    document.getElementById("replayBtn").addEventListener("click", () => {
+      dashboardSection.classList.remove("active");
+      slidesSection.style.display = "flex";
+      showSlide(0);
+      scrollTo(0, 0);
+    });
+
+    document.getElementById("startWrappedBtn").addEventListener("click", () => {
+      readyScreen.style.display = "none";
+      slidesSection.style.display = "flex";
+      showSlide(0);
+      scrollTo(0, 0);
+    });
+
+    function fillSlides(stats) {
+      document.getElementById("slide-total-prompts").textContent = formatNumber(stats.totalPrompts);
+      document.getElementById("slide-total-conversations").textContent = formatNumber(stats.totalConversations);
+      document.getElementById("slide-avg-prompts").textContent = stats.avgPromptsPerChat.toFixed(1);
+      document.getElementById("slide-active-days").textContent = formatNumber(stats.totalActiveDays);
+
+      document.getElementById("slide-most-active-date").textContent = stats.mostActiveDate || "No data";
+      document.getElementById("slide-most-active-date-count").textContent = formatNumber(stats.mostActiveDateCount || 0);
+
+      const weekdayLabel = stats.peakWeekdayIndex != null ? weekdayName(stats.peakWeekdayIndex) : "N/A";
+      document.getElementById("slide-active-weekday").textContent = weekdayLabel;
+
+      const hourLabel = stats.peakHourIndex != null ? formatHourRange(stats.peakHourIndex) : "N/A";
+      document.getElementById("slide-active-hour").textContent = hourLabel;
+
+      document.getElementById("slide-longest-messages").textContent = formatNumber(stats.longestConvMsgs || 0);
+      document.getElementById("slide-longest-duration").textContent =
+        stats.longestConvDurationMinutes ? `${stats.longestConvDurationMinutes} minutes` : "0 minutes";
+      document.getElementById("slide-total-words").textContent = formatNumber(stats.totalWords || 0);
+
+      document.getElementById("ready-total-prompts").textContent = formatNumber(stats.totalPrompts);
+      document.getElementById("ready-total-conversations").textContent = formatNumber(stats.totalConversations);
+      document.getElementById("ready-active-days").textContent = formatNumber(stats.totalActiveDays);
+    }
+
+    function renderDashboard(stats) {
+      document.getElementById("dash-total-prompts").textContent = formatNumber(stats.totalPrompts);
+      document.getElementById("dash-total-conversations").textContent = formatNumber(stats.totalConversations);
+      document.getElementById("dash-active-days").textContent = formatNumber(stats.totalActiveDays);
+      document.getElementById("dash-total-words").textContent = formatNumber(stats.totalWords);
+
+      const peakWeekdayLabel = stats.peakWeekdayIndex != null ? weekdayName(stats.peakWeekdayIndex) : "N/A";
+      document.getElementById("dash-peak-weekday").textContent = peakWeekdayLabel;
+
+      const peakHourLabel = stats.peakHourIndex != null ? formatHourRange(stats.peakHourIndex) : "N/A";
+      document.getElementById("dash-peak-hour").textContent = peakHourLabel;
+
+      document.getElementById("dash-peak-date").textContent = stats.mostActiveDate || "N/A";
+
+      const weekdayCtx = document.getElementById("weekdayChart").getContext("2d");
+      const hourCtx = document.getElementById("hourChart").getContext("2d");
+
+      if (weekdayChart) weekdayChart.destroy();
+      if (hourChart) hourChart.destroy();
+
+      weekdayChart = new Chart(weekdayCtx, {
+        type: "bar",
+        data: {
+          labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+          datasets: [
+            {
+              label: "Prompts",
+              data: stats.weekdayCounts,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+          },
+          scales: {
+            x: {
+              ticks: { color: "#e5e7eb", font: { size: 11 } },
+              grid: { display: false },
+            },
+            y: {
+              ticks: { color: "#9ca3af", font: { size: 10 } },
+              grid: { color: "rgba(148, 163, 184, 0.25)" },
+            },
+          },
+        },
+      });
+
+      hourChart = new Chart(hourCtx, {
+        type: "line",
+        data: {
+          labels: Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0")),
+          datasets: [
+            {
+              label: "Prompts",
+              data: stats.hourCounts,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+          },
+          scales: {
+            x: {
+              ticks: { color: "#e5e7eb", font: { size: 10 } },
+              grid: { display: false },
+            },
+            y: {
+              ticks: { color: "#9ca3af", font: { size: 10 } },
+              grid: { color: "rgba(148, 163, 184, 0.25)" },
+            },
+          },
+        },
+      });
+    }
+
+    fileInput.addEventListener("change", async (event) => {
+      uploadErrorEl.style.display = "none";
+      uploadErrorEl.textContent = "";
+
+      const file = event.target.files[0];
+      if (!file) return;
+      if (!file.name.endsWith(".json")) {
+        uploadErrorEl.textContent = "Please upload a JSON file (conversations.json from your ChatGPT export).";
+        uploadErrorEl.style.display = "block";
+        return;
+      }
+
+      try {
+        const text = await file.text();
+        const json = JSON.parse(text);
+        const { convs, messages } = extractUserMessages(json);
+
+        if (!messages || messages.length === 0) {
+          throw new Error("No user messages found in this JSON. Check that this is conversations.json.");
+        }
+
+        const stats = computeStats(convs, messages);
+        statsGlobal = stats;
+
+        fillSlides(stats);
+
+        uploadScreen.style.display = "none";
+        readyScreen.style.display = "flex";
+        scrollTo(0, 0);
+      } catch (err) {
+        console.error(err);
+        uploadErrorEl.textContent = "Could not read this file. Make sure it is the conversations.json from your ChatGPT export.";
+        uploadErrorEl.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>
