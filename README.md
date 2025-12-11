@@ -8,8 +8,7 @@ Turn your ChatGPT export into a beautiful, private "Wrapped" style story. Upload
 
 ## Preview
 
-![preview](./assets/preview.png)  
-*(Replace this with a real screenshot from your project)*
+
 
 ---
 
